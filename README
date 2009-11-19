@@ -1,0 +1,4 @@
+Roadmap:
+* turn into a gen_server
+* support rfc5424 (latest syslog spec)
+
