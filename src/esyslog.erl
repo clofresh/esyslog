@@ -1,35 +1,24 @@
 % Implementation of syslog server protocol (RFC3164)
 
 -module(esyslog).
--export([listen/1]).
+-behavior(application).
+-export([
+    start/0,
+    start/2, 
+    stop/1
+]).
 
 -define(UDP_OPTIONS, [binary, {active, false}]).
 
-listen(Port) -> 
-    gen_event:start({local, esyslog_logger}),
-    gen_event:add_handler(esyslog_logger, esyslog_console_logger, []),
-    listen_loop(Port).
+start() ->
+    application:start(?MODULE).
 
-listen_loop(Port) -> 
-    io:format("Opening socket at port ~p~n", [Port]),
-    
-    try gen_udp:open(Port, ?UDP_OPTIONS) of
-        {ok, Socket} -> 
-            io:format("Receiving data from socket ~p~n", [Socket]),
-            case gen_udp:recv(Socket, 0) of
-                {ok, {IP, _, Data}} ->
-                    gen_event:notify(esyslog_logger, {log, esyslog_message:parse(binary_to_list(Data))});
+start(_Type, _Args) ->
+    io:format("Starting application~n"),
+    esyslog_supervisor:start_link().
 
-                Other ->
-                    io:format("Nope: ~p~n", [Other])
-            end,
-    
-            gen_udp:close(Socket),
-        
-            listen_loop(Port)
-    catch
-        error:Error ->
-            io:format("~p~n", [Error]),
-            fail
-    end.
+stop(_State) ->
+    ok.
+
+
 
