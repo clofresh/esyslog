@@ -15,9 +15,13 @@ rule ".beam" => ["%{ebin,src}X.erl"] do |t|
   sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin #{t.source}"
 end
 
+task :app => [:compile] do
+  cp "src/esyslog.app", "ebin"
+end
+
 task :compile => ['ebin'] + OBJ
 
-task :default => :compile
+task :default => :app
 
 task :test => [:compile] do
   puts "Modules under test:"
@@ -28,5 +32,9 @@ task :test => [:compile] do
 
     puts "#{mod}: #{test_output}"
   end
+end
+
+task :start => [:app] do
+  sh "erl -pa ebin -s esyslog -run init stop"
 end
 
