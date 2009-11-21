@@ -4,7 +4,7 @@
 
 parse(Message, []) ->
     % Priority
-    io:format("~p (~p)~n", [Message, []]),
+    %io:format("~p (~p)~n", [Message, []]),
     
     "<" ++ PriorityPlusOtherStuff = Message,
     Priority = lists:takewhile(
@@ -18,7 +18,7 @@ parse(Message, []) ->
     
 parse(Message, Parts) when length(Parts) == 1 ->
     % Timestamp
-    io:format("~p (~p)~n", [Message, Parts]),
+    %io:format("~p (~p)~n", [Message, Parts]),
     
     Timestamp = string:sub_string(Message, 1, 15),
     TimestampTuple = list_to_tuple(string:tokens(Timestamp, " ")),
@@ -26,7 +26,7 @@ parse(Message, Parts) when length(Parts) == 1 ->
     
 parse(Message, Parts) when length(Parts) == 2 ->
     % Host
-    io:format("~p (~p)~n", [Message, Parts]),
+    %io:format("~p (~p)~n", [Message, Parts]),
 
     " " ++ HostPlusOtherStuff = Message,
     case string:chr(HostPlusOtherStuff, $ ) of
@@ -40,7 +40,7 @@ parse(Message, Parts) when length(Parts) == 2 ->
     
 parse(Message, Parts) when length(Parts) == 3 ->
     % Tag
-    io:format("~p (~p)~n", [Message, Parts]),
+    %io:format("~p (~p)~n", [Message, Parts]),
     
     case string:chr(Message, $:) of
         0 -> 
@@ -52,12 +52,13 @@ parse(Message, Parts) when length(Parts) == 3 ->
     
 parse(Message, Parts) when length(Parts) == 4 ->
     % Body
-    io:format("~p (~p)~n", [Message, Parts]),
+    %io:format("~p (~p)~n", [Message, Parts]),
     
     " " ++ Body = Message,
     list_to_tuple(lists:reverse([Body] ++ Parts)). 
     
 parse(Message) ->
+    io:format("Parsing message: ~p~n", [Message]),
     try 
         parse(Message, [])
     catch error:{badmatch, _} ->
