@@ -70,5 +70,5 @@ parse_test() ->
      "myhost",
      "mytag[909]",
      "yo what's really real"} = parse("<147>Nov 18 19:17:55 myhost mytag[909]: yo what's really real"),
-    bad_mesage = parse("asdf"),
+    bad_message = parse("asdf"),
     true.
