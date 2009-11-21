@@ -1,5 +1,6 @@
 -module(esyslog_message).
--export([parse/1, test/0]).
+-include_lib("eunit/include/eunit.hrl").
+-export([parse/1]).
 
 parse(Message, []) ->
     % Priority
@@ -63,11 +64,11 @@ parse(Message) ->
         bad_message
     end.
 
-test() ->
+parse_test() ->
     {"147", 
      {"Nov", "18", "19:17:55"},
      "myhost",
      "mytag[909]",
      "yo what's really real"} = parse("<147>Nov 18 19:17:55 myhost mytag[909]: yo what's really real"),
-    bad_message = parse("asdf"),
+    bad_mesage = parse("asdf"),
     true.
