@@ -1,4 +1,4 @@
 Roadmap:
-* turn into a gen_server
+* implement file logger
 * support rfc5424 (latest syslog spec)
 
