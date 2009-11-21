@@ -6,6 +6,8 @@
 -define(UDP_OPTIONS, [binary, {active, false}]).
 
 listen(Port) -> 
+    gen_event:start({local, esyslog_logger}),
+    gen_event:add_handler(esyslog_logger, esyslog_console_logger, []),
     listen_loop(Port).
 
 listen_loop(Port) -> 
@@ -16,8 +18,7 @@ listen_loop(Port) ->
             io:format("Receiving data from socket ~p~n", [Socket]),
             case gen_udp:recv(Socket, 0) of
                 {ok, {IP, _, Data}} ->
-                    io:format("~p~n", [esyslog_message:parse(binary_to_list(Data))]),
-                    listen_loop(Socket);
+                    gen_event:notify(esyslog_logger, {log, esyslog_message:parse(binary_to_list(Data))});
 
                 Other ->
                     io:format("Nope: ~p~n", [Other])
