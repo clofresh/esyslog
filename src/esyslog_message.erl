@@ -55,7 +55,7 @@ parse(Message, Parts) when length(Parts) == 4 ->
     %io:format("~p (~p)~n", [Message, Parts]),
     
     " " ++ Body = Message,
-    list_to_tuple(lists:reverse([Body] ++ Parts)). 
+    list_to_tuple(lists:reverse([string:strip(Body, right, $\n)] ++ Parts)). 
     
 parse(Message) ->
     io:format("Parsing message: ~p~n", [Message]),
