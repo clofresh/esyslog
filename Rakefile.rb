@@ -32,7 +32,7 @@ task :compile => ["ebin"] do
 end
 task :default => :app
 
-task :test => [:compile] do
+task :test => [:app] do
   puts "Modules under test:"
   OBJ.each do |obj|
     obj[%r{.*/(.*).beam}]
