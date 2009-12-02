@@ -5,21 +5,31 @@ ERLC_FLAGS = "-Iinclude +warn_unused_vars +warn_unused_import"
 SRC = FileList['src/*.erl']
 OBJ = SRC.pathmap("%{src,ebin}X.beam")
 
-CLEAN.include("ebin/*.beam")
-CLEAN.include("ebin/*.app")
+["ebin/*.beam",
+ "ebin/*.app",
+ "src/esyslog_config_lexer.erl",
+ "src/esyslog_config_parser.erl"].each { |f| CLEAN.include(f) }
 
 directory 'ebin'
 
-rule ".beam" => ["%{ebin,src}X.erl"] do |t|
-  sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin #{t.source}"
+file "src/esyslog_config_lexer.erl" => ["src/esyslog_config_lexer.xrl"] do |t|
+  sh "erl -run leex file src/esyslog_config_lexer -run init stop"
+end
+
+file "src/esyslog_config_parser.erl" => ["src/esyslog_config_parser.yrl"] do |t|
+  sh "erl -run yecc file src/esyslog_config_parser -run init stop"
 end
 
 file "ebin/esyslog.app" => ["src/esyslog.app"] do |t|
   cp t.prerequisites.first, t.name
 end  
 
-task :app => [:compile, "ebin/esyslog.app"]
-task :compile => ['ebin'] + OBJ
+task :app => [:generate, :compile, "ebin/esyslog.app"]
+task :generate => ["src/esyslog_config_lexer.erl",
+                   "src/esyslog_config_parser.erl"]
+task :compile => ["ebin"] do
+  sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin $(find src -name '*.erl')"
+end
 task :default => :app
 
 task :test => [:compile] do
