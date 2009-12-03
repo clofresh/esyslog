@@ -131,7 +131,7 @@ decode_severity(Severity) ->
     end.
     
 format(Message = {Priority, Timestamp, Host, Tag, Body}) ->
-    string:join([httpd_util:rfc1123_date(Timestamp), Priority, Host, Tag, Body], " ").
+    string:join([httpd_util:rfc1123_date(Timestamp), integer_to_list(Priority), Host, Tag, Body], " ").
 
 parse_test() ->
     {{Year, _, _}, _} = calendar:now_to_local_time(now()),
