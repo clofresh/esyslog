@@ -7,17 +7,19 @@ OBJ = SRC.pathmap("%{src,ebin}X.beam")
 
 ["ebin/*.beam",
  "ebin/*.app",
- "src/esyslog_config_lexer.erl",
- "src/esyslog_config_parser.erl"].each { |f| CLEAN.include(f) }
+ "parser/esyslog_config_lexer.erl",
+ "parser/esyslog_config_parser.erl"].each { |f| CLEAN.include(f) }
 
 directory 'ebin'
 
-file "src/esyslog_config_lexer.erl" => ["src/esyslog_config_lexer.xrl"] do |t|
-  sh "erl -run leex file src/esyslog_config_lexer -run init stop"
+file "parser/esyslog_config_lexer.erl" => ["parser/esyslog_config_lexer.xrl"] do |t|
+  sh "erl -run leex file #{t.name.gsub('.erl', '')} -run init stop"
+  sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin #{t.name}"
 end
 
-file "src/esyslog_config_parser.erl" => ["src/esyslog_config_parser.yrl"] do |t|
-  sh "erl -run yecc file src/esyslog_config_parser -run init stop"
+file "parser/esyslog_config_parser.erl" => ["parser/esyslog_config_parser.yrl"] do |t|
+  sh "erl -run yecc file #{t.name.gsub('.erl', '')} -run init stop"
+  sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin #{t.name}"
 end
 
 file "ebin/esyslog.app" => ["etc/esyslog.app"] do |t|
@@ -25,8 +27,8 @@ file "ebin/esyslog.app" => ["etc/esyslog.app"] do |t|
 end  
 
 task :app => [:generate, :compile, "ebin/esyslog.app"]
-task :generate => ["src/esyslog_config_lexer.erl",
-                   "src/esyslog_config_parser.erl"]
+task :generate => ["parser/esyslog_config_lexer.erl",
+                   "parser/esyslog_config_parser.erl"]
 task :compile => ["ebin"] do
   sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin $(find src -name '*.erl')"
 end
