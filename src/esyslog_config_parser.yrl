@@ -1,5 +1,5 @@
 Nonterminals 
-actions action facility severity target.
+actions action facility severity target newlines.
 
 Terminals
 word filepath host port wildcard newline '.' ':'.
@@ -7,8 +7,8 @@ word filepath host port wildcard newline '.' ':'.
 Rootsymbol actions.
 
 actions -> action : '$1'.
-actions -> action newline : '$1'.
-actions -> action newline actions : ['$1', '$3'].
+actions -> action newlines : '$1'.
+actions -> action newlines actions : ['$1', '$3'].
 action -> facility '.' severity target : [{facility, '$1'}, 
                                           {severity, '$3'}, 
                                           {target,   '$4'}].
@@ -23,3 +23,5 @@ target -> filepath            : {local,  '$1'}.
 target -> host            : {remote, '$1'}.
 target -> host ':' port : {remote, {'$1', '$3'}}.
 
+newlines -> newline : nothin.
+newlines -> newline newlines : nothin.
