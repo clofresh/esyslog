@@ -20,7 +20,7 @@ file "src/esyslog_config_parser.erl" => ["src/esyslog_config_parser.yrl"] do |t|
   sh "erl -run yecc file src/esyslog_config_parser -run init stop"
 end
 
-file "ebin/esyslog.app" => ["src/esyslog.app"] do |t|
+file "ebin/esyslog.app" => ["etc/esyslog.app"] do |t|
   cp t.prerequisites.first, t.name
 end  
 
