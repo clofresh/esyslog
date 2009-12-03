@@ -1,6 +1,6 @@
 -module(esyslog_message).
 -include_lib("eunit/include/eunit.hrl").
--export([parse/1, decode_priority/1]).
+-export([parse/1, decode_priority/1, format/1]).
 
 parse(Message, []) ->
     % Priority
@@ -21,8 +21,27 @@ parse(Message, Parts) when length(Parts) == 1 ->
     %io:format("~p (~p)~n", [Message, Parts]),
     
     Timestamp = string:sub_string(Message, 1, 15),
-    TimestampTuple = list_to_tuple(string:tokens(Timestamp, " ")),
-    parse(string:sub_string(Message, 16), [TimestampTuple] ++ Parts);
+    {MonthStr, DayStr, TimeStr} = list_to_tuple(string:tokens(Timestamp, " ")),
+    {{Year, _, _}, _} = calendar:now_to_local_time(now()),
+    Month = case MonthStr of
+                "Jan" -> 1;
+                "Feb" -> 2;
+		"Mar" -> 3;
+		"Apr" -> 4;
+		"May" -> 5;
+		"Jun" -> 6;
+		"Jul" -> 7;
+		"Aug" -> 8;
+		"Sep" -> 9;
+		"Oct" -> 10;
+		"Nov" -> 11;
+		"Dec" -> 12
+    end,
+    Day = list_to_integer(DayStr),
+    Hour = list_to_integer(string:sub_string(TimeStr, 1, 2)),
+    Minute = list_to_integer(string:sub_string(TimeStr, 4, 5)),
+    Second = list_to_integer(string:sub_string(TimeStr, 7, 8)),
+    parse(string:sub_string(Message, 16), [{{Year, Month, Day}, {Hour, Minute, Second}}] ++ Parts);
     
 parse(Message, Parts) when length(Parts) == 2 ->
     % Host
@@ -111,9 +130,13 @@ decode_severity(Severity) ->
         _ -> undefined
     end.
     
+format(Message = {Priority, Timestamp, Host, Tag, Body}) ->
+    string:join([httpd_util:rfc1123_date(Timestamp), Priority, Host, Tag, Body], " ").
+
 parse_test() ->
+    {{Year, _, _}, _} = calendar:now_to_local_time(now()),
     {147, 
-     {"Nov", "18", "19:17:55"},
+     {{Year, 11, 18}, {19, 17, 55}},
      "myhost",
      "mytag[909]",
      "yo what's really real"} = parse("<147>Nov 18 19:17:55 myhost mytag[909]: yo what's really real"),

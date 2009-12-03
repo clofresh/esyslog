@@ -12,7 +12,8 @@ terminate(_Reason, _State) ->
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
-handle_event({log, {Priority, Timestamp, Host, Tag, Body}}, Config) ->
+handle_event({log, Msg = {Priority, Timestamp, Host, Tag, Body}}, Config) ->
+    io:format("Message: ~p~n", [esyslog_message:format(Msg)]),
     Targets = esyslog_config:get_targets(Priority, Config),
     io:format("~p~n", [Targets]),
     {ok, Config};
