@@ -53,7 +53,9 @@ clean(ParseTree) ->
                         {target,   {remote, {host, _, I}}} -> 
                             {target, {remote, I}};
                         {target,   {remote, {{host, _, I}, {port, _, I2}}}} -> 
-                            {target, {remote, {I, I2}}}
+                            {target, {remote, {I, I2}}};
+                        Bad ->
+                            io:format("Bad match: ~p~n", [Bad])
                     end
                 end,
                 Action

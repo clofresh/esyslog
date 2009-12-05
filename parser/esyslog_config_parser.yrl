@@ -6,9 +6,9 @@ word filepath host port wildcard newline '.' ':'.
 
 Rootsymbol actions.
 
-actions -> action : '$1'.
-actions -> action newlines : '$1'.
-actions -> action newlines actions : ['$1', '$3'].
+actions -> action : ['$1'].
+actions -> action newlines : ['$1'].
+actions -> action newlines actions : lists:append(['$1'], '$3').
 action -> facility '.' severity target : [{facility, '$1'}, 
                                           {severity, '$3'}, 
                                           {target,   '$4'}].
