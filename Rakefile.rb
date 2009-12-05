@@ -2,13 +2,12 @@ require 'rake/clean'
 
 ERLC_FLAGS = "-Iinclude +warn_unused_vars +warn_unused_import"
 
+GENERATED = ["parser/esyslog_config_lexer.erl",
+             "parser/esyslog_config_parser.erl"]
 SRC = FileList['src/*.erl']
+SRC.include(GENERATED)
 OBJ = SRC.pathmap("%{src,ebin}X.beam")
-
-["ebin/*.beam",
- "ebin/*.app",
- "parser/esyslog_config_lexer.erl",
- "parser/esyslog_config_parser.erl"].each { |f| CLEAN.include(f) }
+(["ebin/*.beam", "ebin/*.app"] + GENERATED).each { |f| CLEAN.include(f) }
 
 directory 'ebin'
 directory 'doc'
@@ -31,7 +30,7 @@ task :app => [:generate, :compile, "ebin/esyslog.app"]
 task :generate => ["parser/esyslog_config_lexer.erl",
                    "parser/esyslog_config_parser.erl"]
 task :compile => ["ebin"] do
-  sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin $(find src -name '*.erl')"
+  sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin #{SRC.join(" ")}"
 end
 task :default => :app
 
