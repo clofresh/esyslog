@@ -11,14 +11,15 @@ OBJ = SRC.pathmap("%{src,ebin}X.beam")
  "parser/esyslog_config_parser.erl"].each { |f| CLEAN.include(f) }
 
 directory 'ebin'
+directory 'doc'
 
 file "parser/esyslog_config_lexer.erl" => ["parser/esyslog_config_lexer.xrl"] do |t|
-  sh "erl -run leex file #{t.name.gsub('.erl', '')} -run init stop"
+  sh "erl -noshell -run leex file #{t.name.gsub('.erl', '')} -run init stop"
   sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin #{t.name}"
 end
 
 file "parser/esyslog_config_parser.erl" => ["parser/esyslog_config_parser.yrl"] do |t|
-  sh "erl -run yecc file #{t.name.gsub('.erl', '')} -run init stop"
+  sh "erl -noshell -run yecc file #{t.name.gsub('.erl', '')} -run init stop"
   sh "erlc -D EUNIT -pa ebin -W #{ERLC_FLAGS} -o ebin #{t.name}"
 end
 
@@ -48,4 +49,12 @@ end
 task :start => [:app] do
   sh "erl -sname esyslog -pa ebin -s esyslog -run init stop"
 end
+
+desc "Generate Documentation"
+task :edoc => ["doc"] do
+  cd "doc" do
+    sh "erl -noshell -run edoc files ../#{SRC.join(" ../")} -run init stop"
+  end
+end
+
 

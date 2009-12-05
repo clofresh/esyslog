@@ -1,5 +1,6 @@
 *.beam
 ebin
+doc
 *.dump
 parser/esyslog_config_lexer.erl
 parser/esyslog_config_parser.erl
