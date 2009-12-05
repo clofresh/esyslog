@@ -2,6 +2,23 @@
 -include_lib("eunit/include/eunit.hrl").
 -export([parse/1, decode_priority/1, format/1]).
 
+-type year()     :: non_neg_integer().
+-type month()    :: 1..12.
+-type day()      :: 1..31.
+-type hour()     :: 0..23.
+-type minute()   :: 0..59.
+-type second()   :: 0..59.
+
+-type t_date()         :: {year(),month(),day()}.
+-type t_time()         :: {hour(),minute(),second()}.
+-type t_datetime()     :: {t_date(),t_time()}.
+
+-type priority() :: pos_integer().
+-type host() :: string().
+-type tag() :: string().
+-type body() :: string().
+-type msg() :: {priority(), t_datetime(), host(), tag(), body()}.
+
 parse(Message, []) ->
     % Priority
     %io:format("~p (~p)~n", [Message, []]),
@@ -75,7 +92,8 @@ parse(Message, Parts) when length(Parts) == 4 ->
     
     " " ++ Body = Message,
     list_to_tuple(lists:reverse([string:strip(Body, right, $\n)] ++ Parts)). 
-    
+
+-spec parse(string()) -> msg() | 'bad_message'.
 parse(Message) ->
     io:format("Parsing message: ~p~n", [Message]),
     try 
@@ -130,7 +148,8 @@ decode_severity(Severity) ->
         _ -> undefined
     end.
     
-format(Message = {Priority, Timestamp, Host, Tag, Body}) ->
+-spec format(msg()) -> string().
+format({Priority, Timestamp, Host, Tag, Body}) ->
     string:join([httpd_util:rfc1123_date(Timestamp), integer_to_list(Priority), Host, Tag, Body], " ").
 
 parse_test() ->
