@@ -8,14 +8,14 @@ Syslog is a network protocol for sending log messages. The current standard is [
 
 Dependencies
 ------------
-* [Rake](http://github.com/jimweirich/rake)
+* [Merlke](http://github.com/clofresh/merlke)
 * [Erlang R13B03](http://www.erlang.org/download.html)
 
 Running
 -------
 Assuming you have all the dependencies, you can run:
 
-    rake start
+    merlke start
   
 Which will start a local esyslog server listening at port 7777, using the configuration at ./etc/syslog.conf
 
