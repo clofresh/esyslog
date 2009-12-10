@@ -1,6 +1,6 @@
 -module(esyslog_message).
 -include_lib("eunit/include/eunit.hrl").
--export([parse/1, decode_priority/1, format/1]).
+-export([parse/1, decode_priority/1, format/2]).
 
 -type year()     :: non_neg_integer().
 -type month()    :: 1..12.
@@ -148,9 +148,21 @@ decode_severity(Severity) ->
         _ -> undefined
     end.
     
--spec format(msg()) -> string().
-format({Priority, Timestamp, Host, Tag, Body}) ->
-    string:join([httpd_util:rfc1123_date(Timestamp), integer_to_list(Priority), Host, Tag, Body], " ").
+-spec format(atom(), msg()) -> string().
+format(human, {Priority, Timestamp, Host, Tag, Body}) ->
+    string:join([httpd_util:rfc1123_date(Timestamp), integer_to_list(Priority), Host, Tag, Body], " ");
+
+format(rfc3164, {Priority, Timestamp, Host, Tag, Body}) ->
+    string:join([
+        "<", integer_to_list(Priority), ">", 
+        httpd_util:rfc1123_date(Timestamp), 
+        " ",
+        Host,
+        " ",
+        Tag,
+        ": ",
+        Body
+    ], "").
 
 parse_test() ->
     {{Year, _, _}, _} = calendar:now_to_local_time(now()),

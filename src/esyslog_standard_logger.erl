@@ -13,7 +13,7 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 handle_event({log, Msg = {Priority, Timestamp, Host, Tag, Body}}, Config) ->
-    io:format("Message: ~p~n", [esyslog_message:format(Msg)]),
+    io:format("Message: ~p~n", [esyslog_message:format(human, Msg)]),
     Targets = esyslog_config:get_targets(Priority, Config),
     io:format("~p~n", [Targets]),
     lists:foreach(
@@ -39,22 +39,34 @@ log(Msg, {local, Filename}) ->
     io:format("Writing locally to ~p~n", [Filename]),
     {ok, IoDevice} = file:open(Filename, [append]),
     try
-        io:put_chars(IoDevice, string:concat(esyslog_message:format(Msg), "\n"))
+        io:put_chars(IoDevice, string:concat(esyslog_message:format(human, Msg), "\n"))
     after
         file:close(IoDevice)
     end,
     ok;
     
 log(Msg, {remote, Remote}) ->
-    case Remote of
-        {Host, Port} ->
-            io:format("Writing remotely to ~p port ~p~n", [Host, Port]);
-    
-        Host ->
-            io:format("Writing remotely to ~p~n", [Host])
+    {Host, Port} = case Remote of
+        {H, P} -> {H, P};
+        H      -> {H, application:get_env(esyslog, port)}
     end,
-    ok.
-    
+
+    io:format("Writing remotely to ~p port ~p~n", [Host, Port]),
+
+    case gen_udp:open(Port) of
+        {ok, Socket} ->
+            case gen_udp:send(Socket, Host, Port, esyslog_message:format(rfc3164, Msg)) of
+                ok -> 
+                    ok;
+                {error, Reason} -> 
+                    io:format("Failed to send to ~s:~B: ~p~n", [Host, Port, Reason]),
+                    {error, Reason}
+            end;
+        {error, Reason} ->
+            io:format("Failed to open udp socket to ~s:~B: ~p~n", [Host, Port, Reason]),
+            {error, Reason}
+    end.
+
     
     
     
