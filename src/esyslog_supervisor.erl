@@ -9,7 +9,7 @@ start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init(_Args) ->
-    Port = 7777,
+    {ok, Port} = application:get_env(esyslog, port),
     
     Policy = {one_for_one, 1, 60},
     EventManager = {esyslog_event_manager, 
