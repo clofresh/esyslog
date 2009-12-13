@@ -2,16 +2,33 @@
 -include_lib("eunit/include/eunit.hrl").
 -export([parse/1, decode_priority/1, format/1]).
 
--type year()     :: non_neg_integer().
--type month()    :: 1..12.
--type day()      :: 1..31.
--type hour()     :: 0..23.
--type minute()   :: 0..59.
--type second()   :: 0..59.
 
--type t_date()         :: {year(),month(),day()}.
--type t_time()         :: {hour(),minute(),second()}.
--type t_datetime()     :: {t_date(),t_time()}.
+%% @type datetime() = {{Year, Month, Day}, {Hour, Minute, Second}}
+%%      Year   = integer(),
+%%      Month  = integer(),
+%%      Day    = integer(),
+%%      Hour   = integer(),
+%%      Minute = integer(),
+%%      Second = integer().
+
+%% @type priority() = integer().
+%% An integer encoding the facility and priority of a syslog message.
+%% Defined in <a href="http://tools.ietf.org/html/rfc3164#section-4.1.1">RFC3164</a>
+
+%% @type facility() = integer().
+%% An integer between 0 and 23 inclusive that indicates the syslog facility. 
+%% Defined in <a href="http://tools.ietf.org/html/rfc3164#section-4.1.1">RFC3164</a>
+
+%% @type severity() = integer().
+%% An integer between 0 and 7 inclusive that indicates the syslog severity. 
+%% Defined in <a href="http://tools.ietf.org/html/rfc3164#section-4.1.1">RFC3164</a>
+
+%% @type msg() = {Priority, DateTime, Host, Tag, Body}
+%%      Priority = priority(),
+%%      DateTime = datetime(),
+%%      Host     = string(),
+%%      Tag      = string(),
+%%      Body     = string().
 
 -type priority() :: pos_integer().
 -type host() :: string().
@@ -93,7 +110,8 @@ parse(Message, Parts) when length(Parts) == 4 ->
     " " ++ Body = Message,
     list_to_tuple(lists:reverse([string:strip(Body, right, $\n)] ++ Parts)). 
 
--spec parse(string()) -> msg() | 'bad_message'.
+%% @spec parse(Message::string()) -> msg() | bad_message
+%% @doc Parses a string into a syslog message tuple
 parse(Message) ->
     io:format("Parsing message: ~p~n", [Message]),
     try 
@@ -102,6 +120,8 @@ parse(Message) ->
         bad_message
     end.
 
+%% @spec decode_priority(Priority::priority()) -> {facility(), severity()}
+%% @doc Decodes a priority value into facility and severity
 decode_priority(Priority) ->
     {decode_facility(Priority div 8), 
      decode_severity(Priority rem 8)}.
@@ -148,7 +168,8 @@ decode_severity(Severity) ->
         _ -> undefined
     end.
     
--spec format(msg()) -> string().
+%% @spec format(Msg::msg()) -> string()
+%% @doc Pretty-print a syslog message tuple
 format({Priority, Timestamp, Host, Tag, Body}) ->
     string:join([httpd_util:rfc1123_date(Timestamp), integer_to_list(Priority), Host, Tag, Body], " ").
 
