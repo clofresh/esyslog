@@ -30,12 +30,6 @@
 %%      Tag      = string(),
 %%      Body     = string().
 
--type priority() :: pos_integer().
--type host() :: string().
--type tag() :: string().
--type body() :: string().
--type msg() :: {priority(), t_datetime(), host(), tag(), body()}.
-
 parse(Message, []) ->
     % Priority
     %io:format("~p (~p)~n", [Message, []]),
