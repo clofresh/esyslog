@@ -67,8 +67,16 @@ cleanup_header({PriorityMonth, Day, Hour, Minute, Second, Tag}) ->
     cleanup_header({PriorityMonth, Day, Hour, Minute, Second, {word, "localhost"}, Tag}).
     
 cleanup_body(BodyTokens) ->
-    [Current, Next | Rest] = BodyTokens,
-    cleanup_body(Current, Next, Rest, []).
+    case length(BodyTokens) of
+        0 -> 
+            "";
+        1 -> 
+            [{_, Body}] = BodyTokens,
+            Body;
+        _ ->
+            [Current, Next | Rest] = BodyTokens,
+            cleanup_body(Current, Next, Rest, [])
+    end.
 
 cleanup_body_merge_colon({_, Current}, [{':', Next} | Rest]) ->
     cleanup_body_merge_colon({word, string:concat(Current, Next)}, Rest);

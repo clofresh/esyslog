@@ -120,6 +120,12 @@ parse_test() ->
      "mytag[909]",
      "yo what's really real"} = parse("<147>Nov 18 19:17:55 myhost mytag[909]: yo what's really real"),
 
+    {147, 
+     {{Year, 11, 18}, {19, 17, 55}},
+     "myhost",
+     "mytag[909]",
+     "yo"} = parse("<147>Nov 18 19:17:55 myhost mytag[909]: yo"),
+
     bad_message = parse("asdf"),
 
 
