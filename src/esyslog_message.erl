@@ -1,6 +1,6 @@
 -module(esyslog_message).
 -include_lib("eunit/include/eunit.hrl").
--export([parse/1, decode_priority/1, format/1]).
+-export([parse/1, decode_priority/1, format/1, couchdoc/1, sortable_datetime_str/1]).
 
 
 %% @type datetime() = {{Year, Month, Day}, {Hour, Minute, Second}}
@@ -96,6 +96,32 @@ decode_severity(Severity) ->
 %% @doc Pretty-print a syslog message tuple
 format({Priority, Timestamp, Host, Tag, Body}) ->
     string:join([httpd_util:rfc1123_date(Timestamp), integer_to_list(Priority), Host, Tag, Body], " ").
+
+couchdoc({Priority, Timestamp, Host, Tag, Body}) ->
+    [
+        {<<"priority">>, list_to_binary(integer_to_list(Priority))},
+        {<<"timestamp">>, list_to_binary(sortable_datetime_str(Timestamp))},
+        {<<"host">>, list_to_binary(Host)},
+        {<<"tag">>, list_to_binary(Tag)},
+        {<<"body">>, list_to_binary(Body)}
+    ].
+
+sortable_datetime_str({Date, Time}) ->
+    S = lists:map(
+            fun({Input, Separator}) -> 
+                string:join(
+                    lists:map(fun(E) -> integer_to_list(E) end,
+                              tuple_to_list(Input)), 
+                    Separator
+                )
+            end,
+        [{Date, "-"}, {Time, ":"}]),
+    
+    string:join(S, " ").
+
+datetime_test() ->
+    "2009-12-13 19:40:50" = sortable_datetime_str({{2009, 12, 13}, {19, 40, 50}}),
+    true.
 
 parse_test() ->
     {{Year, _, _}, _} = calendar:now_to_local_time(now()),

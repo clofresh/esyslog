@@ -1,0 +1,3 @@
+[submodule "deps/couchbeam"]
+	path = deps/couchbeam
+	url = git://github.com/benoitc/couchbeam.git
