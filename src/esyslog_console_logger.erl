@@ -17,14 +17,14 @@ handle_event({log, {Priority, Timestamp, Host, Tag, Body}}, State) ->
     {ok, State};
     
 handle_event(Event, State) ->
-    io:format("Catchall: ~p, ~p~n", [Event, State]),
+    io:format("~p catchall: ~p, ~p~n", [?MODULE, Event, State]),
     {ok, State}.
 
 handle_call(Call, State) ->
-    io:format("Catchall: ~p, ~p~n", [Call, State]),
+    io:format("~p catchall: ~p, ~p~n", [?MODULE, Call, State]),
     {ok, State}.
 
 handle_info(Info, State) ->
-    io:format("Catchall: ~p, ~p~n", [Info, State]),
+    io:format("~p catchall: ~p, ~p~n", [?MODULE, Info, State]),
     {ok, State}.
 

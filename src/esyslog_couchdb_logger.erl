@@ -13,20 +13,15 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 handle_event({log, Msg = {Priority, Timestamp, Host, Tag, Body}}, Db) ->
-    io:format("Logging: ~p ~p ~p ~p ~p~n", [Priority, Timestamp, Host, Tag, Body]),
     couchbeam_db:save_doc(Db, {esyslog_message:couchdoc(Msg)}),
-    {ok, Db};
-    
-handle_event(Event, State) ->
-    io:format("Catchall: ~p, ~p~n", [Event, State]),
-    {ok, State}.
-
+    {ok, Db}.
+  
 handle_call(Call, State) ->
-    io:format("Catchall: ~p, ~p~n", [Call, State]),
+    io:format("~p catchall: ~p, ~p~n", [?MODULE, Call, State]),
     {ok, State}.
 
 handle_info(Info, State) ->
-    io:format("Catchall: ~p, ~p~n", [Info, State]),
+    io:format("~p catchall: ~p, ~p~n", [?MODULE, Info, State]),
     {ok, State}.
 
 

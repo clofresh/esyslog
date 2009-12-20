@@ -12,14 +12,13 @@ start(Port) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [Port], []).
 
 init([Port]) ->
+    io:format("Opening socket at port ~p~n", [Port]),
     listen_loop(Port).
 
 listen_loop(Port) ->
-    io:format("Opening socket at port ~p~n", [Port]),
-    
     try gen_udp:open(Port, ?UDP_OPTIONS) of
         {ok, Socket} -> 
-            io:format("Receiving data from socket ~p~n", [Socket]),
+
             case gen_udp:recv(Socket, 0) of
                 {ok, {IP, _, Data}} ->
                     gen_event:notify(esyslog_logger, {log, esyslog_message:parse(binary_to_list(Data))});
@@ -38,18 +37,14 @@ listen_loop(Port) ->
     end.
 
 handle_cast(Cast, State) ->
-    io:format("Catchall: ~p, ~p~n", [Cast, State]),
+    io:format("~p catchall: ~p, ~p~n", [?MODULE, Cast, State]),
     {ok, State}.
 
 handle_call({logged}, Caller, Port) ->
-    listen_loop(Port);
-
-handle_call(Call, Caller, State) ->
-    io:format("Catchall: ~p, ~p~n", [Call, State]),
-    {ok, State}.
+    listen_loop(Port).
 
 handle_info(Info, State) ->
-    io:format("Catchall: ~p, ~p~n", [Info, State]),
+    io:format("~p catchall: ~p, ~p~n", [?MODULE, Info, State]),
     {ok, State}.
 
 terminate(_Reason, _Library) -> ok.

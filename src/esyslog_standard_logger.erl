@@ -13,19 +13,13 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 handle_event({log, Msg = {Priority, Timestamp, Host, Tag, Body}}, Config) ->
-    io:format("Message: ~p~n", [esyslog_message:format(Msg)]),
     Targets = esyslog_config:get_targets(Priority, Config),
-    io:format("~p~n", [Targets]),
     lists:foreach(
         fun(Target) ->
             log(Msg, Target)
         end,
     Targets),
-    {ok, Config};
-    
-handle_event(Event, State) ->
-    io:format("Catchall: ~p, ~p~n", [Event, State]),
-    {ok, State}.
+    {ok, Config}.
 
 handle_call(Call, State) ->
     io:format("Catchall: ~p, ~p~n", [Call, State]),

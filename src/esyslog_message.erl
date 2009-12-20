@@ -34,13 +34,12 @@
 %% @spec parse(Message::string()) -> msg() | bad_message
 %% @doc Parses a string into a syslog message tuple
 parse(Message) ->
-    io:format("Parsing message: ~p~n", [Message]),
     try 
         {ok, Tokens, _} = esyslog_message_lexer:string(Message),
         {ok, ParsedMessage} = esyslog_message_parser:parse(Tokens),
         ParsedMessage
     catch error:{badmatch, Error} ->
-        io:format("Message parse error: ~p~n", [Error]),
+        io:format("Couldn't parse: ~p~n~p~n", [Message, Error]),
         bad_message
     end.
 
@@ -160,6 +159,18 @@ parse_test() ->
      "myhost",
      "mytag[909]",
      "yo"} = parse("<147>Nov 18 19:17:55 myhost mytag[909]: yo"),
+    
+    %{4,
+    % {{Year, 12, 20}, {16, 27, 32}},
+    % "ccabanilla-mac",
+    % "com.apple.launchd.peruser.501[522] (org.apache.couchdb[59972])",
+    % "Exited with exit code: 1"} = parse("<4>Dec 20 16:27:32 ccabanilla-mac com.apple.launchd.peruser.501[522] (org.apache.couchdb[59972]): Exited with exit code: 1"),
+     
+    %{5,
+    % {{Year, 12, 20}, {16, 27, 32}},
+    % "ccabanilla-mac",
+    % "[0x0-0x99099].com.fluidapp.FluidInstance.Gmail[32480]",
+    % "Sun Dec 20 16:27:32 ccabanilla-mac FluidInstance[32480] <Error>: kCGErrorIllegalArgument: CGSGetWindowBounds: NULL window"} = parse("<5>Dec 20 16:27:32 ccabanilla-mac [0x0-0x99099].com.fluidapp.FluidInstance.Gmail[32480]: Sun Dec 20 16:27:32 ccabanilla-mac FluidInstance[32480] <Error>: kCGErrorIllegalArgument: CGSGetWindowBounds: NULL window"),
 
     bad_message = parse("asdf"),
 
