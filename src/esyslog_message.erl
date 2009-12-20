@@ -110,8 +110,16 @@ sortable_datetime_str({Date, Time}) ->
     S = lists:map(
             fun({Input, Separator}) -> 
                 string:join(
-                    lists:map(fun(E) -> integer_to_list(E) end,
-                              tuple_to_list(Input)), 
+                    lists:map(
+                      fun(E) -> 
+                        Str = integer_to_list(E),
+                        case length(Str) of
+                          1 -> "0" ++ Str;
+                          _ -> Str
+                        end 
+                      end,
+                      tuple_to_list(Input)
+                    ),
                     Separator
                 )
             end,
@@ -121,6 +129,7 @@ sortable_datetime_str({Date, Time}) ->
 
 datetime_test() ->
     "2009-12-13 19:40:50" = sortable_datetime_str({{2009, 12, 13}, {19, 40, 50}}),
+    "2009-01-13 01:04:05" = sortable_datetime_str({{2009, 1, 13}, {1, 4, 5}}),
     true.
 
 parse_test() ->
