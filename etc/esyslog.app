@@ -2,6 +2,7 @@
 	{description,  "Erlang Syslog Server"},
 	{mod, {esyslog, []}},
 	{env, [
-		{port, 7777}
+		{port, 7777},
+		{couchdb, {"localhost", 5984}}
 	]}
 ]}.
