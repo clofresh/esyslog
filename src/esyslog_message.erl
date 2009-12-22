@@ -105,10 +105,10 @@ couchdoc({Priority, Timestamp, Host, Tag, Body}) ->
         {<<"body">>, list_to_binary(Body)}
     ].
 
-sortable_datetime_str({Date, Time}) ->
+sortable_datetime_str(Datetime) ->
     S = lists:map(
-            fun({Input, Separator}) -> 
-                string:join(
+            fun(Input) -> 
+                lists:concat(
                     lists:map(
                       fun(E) -> 
                         Str = integer_to_list(E),
@@ -118,17 +118,16 @@ sortable_datetime_str({Date, Time}) ->
                         end 
                       end,
                       tuple_to_list(Input)
-                    ),
-                    Separator
+                    )
                 )
             end,
-        [{Date, "-"}, {Time, ":"}]),
+        tuple_to_list(Datetime)),
     
-    string:join(S, " ").
+    lists:concat(S).
 
 datetime_test() ->
-    "2009-12-13 19:40:50" = sortable_datetime_str({{2009, 12, 13}, {19, 40, 50}}),
-    "2009-01-13 01:04:05" = sortable_datetime_str({{2009, 1, 13}, {1, 4, 5}}),
+    "20091213194050" = sortable_datetime_str({{2009, 12, 13}, {19, 40, 50}}),
+    "20090113010405" = sortable_datetime_str({{2009, 1, 13}, {1, 4, 5}}),
     true.
 
 parse_test() ->
