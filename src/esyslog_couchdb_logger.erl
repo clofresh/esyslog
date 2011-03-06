@@ -13,7 +13,7 @@ code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
 
 handle_event({log, Msg = {Priority, Timestamp, Host, Tag, Body}}, Db) ->
-    couchbeam_db:save_doc(Db, {esyslog_message:couchdoc(Msg)}),
+    couchbeam:save_doc(Db, {esyslog_message:couchdoc(Msg)}),
     {ok, Db}.
   
 handle_call(Call, State) ->

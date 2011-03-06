@@ -12,9 +12,11 @@ start() ->
     
     {ok, {CouchDbHost, CouchDbPort}} = application:get_env(esyslog, couchdb),
     
-    couchbeam_server:start_connection(#couchdb_params{host=CouchDbHost,
-                                                      port=CouchDbPort}),
-    Db = couchbeam_db:open(default, "esyslog"),
+    Prefix = "",
+    Options = [],
+    
+    S = couchbeam:server_connection(CouchDbHost, CouchDbPort, Prefix, Options),
+    {ok, Db} = couchbeam:open_db(S, "esyslog"),
 
     gen_event:add_handler(esyslog_logger, esyslog_standard_logger, Config),
     gen_event:add_handler(esyslog_logger, esyslog_couchdb_logger, Db),
